@@ -69,7 +69,8 @@ d3.csv("../data/revenues.csv")
 
         function update(data) {
 
-            let value = flag ? "profit" : "revenue"
+            const value = flag ? "profit" : "revenue"
+            const t = d3.transition(500)
 
             x.domain(data.map(d => d.month))
             y.domain([0, d3.max(data, d => d[value])])
@@ -78,34 +79,38 @@ d3.csv("../data/revenues.csv")
 
             xAxisGroup
                 .attr("transform", `translate(0, ${HEIGHT})`)
+                .transition(t)
                 .call(xAxisCall)
 
         const yAxisCall = d3.axisLeft(y)
 
             yAxisGroup
+                .transition(t)
                 .call(yAxisCall)
             
         
         const rects = g.selectAll("rect")
-            .data(data)
+            .data(data, d => d.month)
         
-        rects.exit().remove()
-
-        rects
-            .attr("x", d => x(d.month))
-            .attr("y", d => y(d[value]))
-            .attr("height", d => HEIGHT - y(d[value]))
-            .attr("width", x.bandwidth)
-            .attr("fill", "grey")
+        rects.exit()
+            .attr("fill", "red")
+            .transition(t)
+            .attr("height", 0)
+            .attr("y", y(0))
+            .remove()
 
         rects.enter().append("rect")
+            .attr("fill", "grey")
+            .attr("y", y(0))
+            .attr("height", 0)
+            .merge(rects)
+            .transition(t)
             .attr("x", d => x(d.month))
             .attr("y", d => y(d[value]))
             .attr("height", d => HEIGHT - y(d[value]))
             .attr("width", x.bandwidth)
-            .attr("fill", "grey")
 
-            let text = flag ? "Profit ($)" : "Revenue ($)"
+            const text = flag ? "Profit ($)" : "Revenue ($)"
             yAxisLabel.text(text)
         }
 })
