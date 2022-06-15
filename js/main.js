@@ -34,20 +34,32 @@ d3.csv("../data/revenues.csv")
             .domain([0, d3.max(data, d => d.revenue)])
             .range([HEIGHT, 0])
         
+
+        d3.interval(() => {
+            update(data)
+        }, 1000)
+
+        const xAxisGroup = g.append("g")
+        .attr("class", "x axis")
+
+        const yAxisGroup = g.append("g")
+        .attr("class", "y axis")
+
+        function update(data) {
+            x.domain(data.map(d => d.month))
+            y.domain([0, d3.max(data, d => d.revenue)])
+        
         const xAxisCall = d3.axisBottom(x)
 
-        g.append("g")
-            .attr("class", "x axis")
-            .attr("transform", `translate(0, ${HEIGHT})`)
-            .call(xAxisCall)
+            xAxisGroup
+                .attr("transform", `translate(0, ${HEIGHT})`)
+                .call(xAxisCall)
 
         const yAxisCall = d3.axisLeft(y)
 
-        g.append("g")
-            .attr("class", "y axis")
-            .call(yAxisCall)
-            .selectAll("text")
-        
+            yAxisGroup
+                .call(yAxisCall)
+            }
         // X Label
         g.append("text")
             .attr("class", "x axis-label")
